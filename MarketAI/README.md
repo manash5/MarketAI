@@ -1,18 +1,42 @@
 # 🚀 Agentic Marketing Crew — CrewAI
 
-A multi-agent marketing system built with **CrewAI** that handles both
-**content creation** and **cold outreach** for any product.
+An AI-powered multi-agent marketing system built with **CrewAI** that
+autonomously handles your entire marketing workflow — from market research
+and strategy, to content creation and cold outreach — all from a single
+command.
+
+You provide your product details. The crew does the rest.
+
+---
+
+## 💡 What Does This Project Do?
+
+Given a product name, description, target audience, and budget, this system
+spins up 4 specialised AI agents that work sequentially to produce a full
+week's worth of marketing output:
+
+- **Market research** — competitor analysis, customer pain points, channel insights
+- **Marketing strategy** — positioning, ICP, budget allocation, weekly plan
+- **Content calendar** — 7-day schedule with posting times per platform
+- **Social media posts** — 2 platform-native posts (LinkedIn + Instagram)
+- **Reel script** — 1 Instagram reel script with hook, scenes, and CTA
+- **ICP research** — 3 detailed buyer personas with pain points and language
+- **Cold email templates** — 2 personalised sequences with A/B subject lines and follow-ups
+- **Social outreach playbooks** — LinkedIn and Instagram DM sequences per persona
+
+All outputs are saved as markdown files to your local `resources/drafts/` folder,
+ready for review, editing, and publishing.
 
 ---
 
 ## 🤖 Agents
 
-| Agent | Role | Model |
+| Agent | Role | Responsibilities |
 |---|---|---|
-| **Head of Marketing** | Market research + strategy | `llama-3.3-70b` (Groq) |
-| **Creative Content Creator** | Social posts + reel scripts + content calendar | `llama-3.3-70b` (Groq) |
-| **Cold Email Template Writer** | ICP research + cold email sequences | `llama-3.1-8b-instant` (Groq) |
-| **Social Media Outreacher** | LinkedIn + Instagram DM playbooks | `llama-3.1-8b-instant` (Groq) |
+| **Head of Marketing** | Strategy Lead | Market research, marketing strategy |
+| **Creative Content Creator** | Content Lead | Content calendar, social posts, reel scripts |
+| **Cold Email Template Writer** | Outreach Lead | ICP research, cold email sequences |
+| **Social Media Outreacher** | DM Lead | LinkedIn + Instagram outreach playbooks |
 
 ---
 
@@ -29,98 +53,136 @@ A multi-agent marketing system built with **CrewAI** that handles both
 8. write_outreach_messages      → Social Media Outreacher
 ```
 
----
-
-## 🆓 Free API Options (pick one)
-
-| Provider | Model | Free Limits | Sign Up |
-|---|---|---|---|
-| **Groq** ⭐ (recommended) | `llama-3.3-70b-versatile` | 30 RPM, 14,400 req/day | https://console.groq.com |
-| Google Gemini | `gemini-2.0-flash` | 15 RPM, 1,500 req/day | https://aistudio.google.com |
-| Google Gemini | `gemini-2.5-flash` | 10 RPM, 500 req/day | https://aistudio.google.com |
-| Cerebras | `llama-3.3-70b` | Generous free tier | https://cloud.cerebras.ai |
-
-> **Why Groq?** It's the fastest free inference provider, supports tool use,
-> has the highest free RPM (30), and works out-of-the-box with CrewAI's LLM class.
+Each task's output is automatically passed as context to the next relevant
+task via CrewAI's memory system — no manual handoff needed.
 
 ---
 
 ## 📁 Output Folder Structure
 
+After a successful run, your `resources/drafts/` folder will contain:
+
 ```
 resources/
 └── drafts/
-    ├── market_research.md
-    ├── marketing_strategy.md
-    ├── content_calendar.md
-    ├── icp_research.md
+    ├── market_research.md       ← competitor + trend analysis
+    ├── marketing_strategy.md    ← full one-week strategy
+    ├── content_calendar.md      ← 7-day posting schedule
+    ├── icp_research.md          ← 3 buyer personas
     ├── posts/
-    │   ├── post_1.md
-    │   ├── post_2.md
-    │   ├── post_3.md
-    │   ├── post_4.md
-    │   └── post_5.md
+    │   ├── post_1.md            ← LinkedIn post
+    │   └── post_2.md            ← Instagram post
     ├── reels/
-    │   ├── reel_1.md
-    │   └── reel_2.md
+    │   └── reel_1.md            ← Instagram reel script
     ├── cold_emails/
-    │   ├── email_persona_1.md
-    │   ├── email_persona_2.md
-    │   └── email_persona_3.md
+    │   ├── email_persona_1.md   ← cold email sequence for persona 1
+    │   └── email_persona_2.md   ← cold email sequence for persona 2
     └── outreach/
-        ├── linkedin_outreach.md
-        └── instagram_outreach.md
+        ├── linkedin_outreach.md ← LinkedIn DM playbook
+        └── instagram_outreach.md← Instagram DM playbook
 ```
 
 ---
 
 ## ⚙️ Setup
 
+### 1. Install dependencies
 ```bash
-# 1. Install dependencies
-pip install crewai crewai-tools python-dotenv groq
+pip install crewai crewai-tools python-dotenv
+```
 
-# 2. Configure environment
+### 2. Configure environment
+```bash
 cp .env.example .env
-# Fill in GROQ_API_KEY and SERPER_API_KEY
+```
+Fill in your API keys in `.env`:
+```env
+SERPER_API_KEY=your_serper_key   # https://serper.dev (free: 2,500 searches/month)
+```
 
-# 3. Create output directories
+### 3. Set up Ollama (local LLM — no API cost)
+```bash
+# Install Ollama from https://ollama.com
+# Then pull a model:
+ollama pull mistral        # recommended for most machines
+ollama pull llama3.1       # better quality if you have 16GB+ RAM
+```
+
+### 4. Create output directories
+```bash
 mkdir -p resources/drafts/posts resources/drafts/reels \
          resources/drafts/cold_emails resources/drafts/outreach
+```
 
-# 4. Run the crew
+### 5. Run the crew
+```bash
 python crew.py
+```
+
+---
+
+## 🎯 Customise Your Inputs
+
+Edit these in `crew.py` under `if __name__ == "__main__"`:
+
+```python
+inputs = {
+    "product_name": "Your Product Name",
+    "target_audience": "Your Target Audience",
+    "product_description": "What your product does and who it helps",
+    "budget": "Your Marketing Budget",
+    "current_date": datetime.now().strftime("%Y-%m-%d"),
+}
 ```
 
 ---
 
 ## 🔧 Swapping Models
 
-In `crew.py`, update the `llm` and `llm_fast` variables:
+The crew uses **Ollama (local)** by default — no API costs, no rate limits.
+Update the `llm` variables at the top of `crew.py` to switch:
 
 ```python
-# Groq (default)
-llm = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.7)
+# Ollama — local, free, no limits (default)
+llm = LLM(model="ollama/mistral", base_url="http://localhost:11434", temperature=0.7)
 
-# Switch to Gemini 2.0 Flash
+# Gemini 2.0 Flash — free API, best tool-use reliability
 llm = LLM(model="gemini/gemini-2.0-flash", temperature=0.7)
+# Requires: GEMINI_API_KEY in .env — get free key at https://aistudio.google.com
 
-# Switch to Cerebras
-llm = LLM(model="cerebras/llama-3.3-70b", temperature=0.7)
+# Groq — fast free API, good for prototyping
+llm = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.7)
+# Requires: GROQ_API_KEY in .env — get free key at https://console.groq.com
 ```
 
 ---
 
-## 🎯 Inputs
+## ⚠️ Known Limitations with Local Models
 
-Customise these in `crew.py` → `__main__`:
+Running local models (Mistral, Llama) works but has some quirks:
 
-```python
-inputs = {
-    "product_name": "Your Product Name",
-    "target_audience": "Your Target Audience",
-    "product_description": "What your product does",
-    "budget": "Your Budget",
-    "current_date": datetime.now().strftime("%Y-%m-%d"),
-}
+| Issue | Cause | Status |
+|---|---|---|
+| Tool name hallucination | Small models call wrong tool names | Handled via `max_iter=3` |
+| Encoding errors | Emojis in output on Windows | Fixed via `UTF8FileWriterTool` |
+| Slow inference | Large context on CPU | Reduced via short task descriptions |
+| Timeout on later tasks | Accumulated context too large | Reduced via minimal context chaining |
+
+For the most reliable results, use **Gemini 2.0 Flash** (free API key from Google AI Studio).
+
+---
+
+## 🗂️ Project Structure
+
+```
+marketAI/
+├── crew.py                  ← main entry point
+├── config/
+│   ├── agents.yaml          ← agent roles, goals, backstories
+│   └── tasks.yaml           ← task descriptions and expected outputs
+├── resources/
+│   └── drafts/              ← all generated marketing content
+├── .env                     ← your API keys (never commit this)
+├── .env.example             ← template for .env
+└── README.md                ← this file
 ```
