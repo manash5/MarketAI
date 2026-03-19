@@ -1,1 +1,0 @@
-Hi Operations Manager,\n\nWant to boost efficiency and visibility into your business performance? Our AI-powered automation solution can help. Let's discuss how to scale your operations.
