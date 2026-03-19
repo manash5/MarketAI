@@ -1,72 +1,126 @@
-# TestingProject Crew
+# 🚀 Agentic Marketing Crew — CrewAI
 
-Welcome to the TestingProject Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+A multi-agent marketing system built with **CrewAI** that handles both
+**content creation** and **cold outreach** for any product.
 
-## Installation
+---
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+## 🤖 Agents
 
-First, if you haven't already, install uv:
+| Agent | Role | Model |
+|---|---|---|
+| **Head of Marketing** | Market research + strategy | `llama-3.3-70b` (Groq) |
+| **Creative Content Creator** | Social posts + reel scripts + content calendar | `llama-3.3-70b` (Groq) |
+| **Cold Email Template Writer** | ICP research + cold email sequences | `llama-3.1-8b-instant` (Groq) |
+| **Social Media Outreacher** | LinkedIn + Instagram DM playbooks | `llama-3.1-8b-instant` (Groq) |
 
-```bash
-pip install uv
+---
+
+## 📋 Task Pipeline (Sequential)
+
+```
+1. market_research              → Head of Marketing
+2. prepare_marketing_strategy   → Head of Marketing
+3. create_content_calendar      → Creative Content Creator
+4. create_social_media_posts    → Creative Content Creator
+5. prepare_scripts_for_reels    → Creative Content Creator
+6. icp_research                 → Cold Email Writer
+7. write_cold_email_templates   → Cold Email Writer
+8. write_outreach_messages      → Social Media Outreacher
 ```
 
-Next, navigate to your project directory and install the dependencies:
+---
 
-(Optional) Lock the dependencies and install them by using the CLI command:
+## 🆓 Free API Options (pick one)
 
-```bash
-crewai install
+| Provider | Model | Free Limits | Sign Up |
+|---|---|---|---|
+| **Groq** ⭐ (recommended) | `llama-3.3-70b-versatile` | 30 RPM, 14,400 req/day | https://console.groq.com |
+| Google Gemini | `gemini-2.0-flash` | 15 RPM, 1,500 req/day | https://aistudio.google.com |
+| Google Gemini | `gemini-2.5-flash` | 10 RPM, 500 req/day | https://aistudio.google.com |
+| Cerebras | `llama-3.3-70b` | Generous free tier | https://cloud.cerebras.ai |
+
+> **Why Groq?** It's the fastest free inference provider, supports tool use,
+> has the highest free RPM (30), and works out-of-the-box with CrewAI's LLM class.
+
+---
+
+## 📁 Output Folder Structure
+
+```
+resources/
+└── drafts/
+    ├── market_research.md
+    ├── marketing_strategy.md
+    ├── content_calendar.md
+    ├── icp_research.md
+    ├── posts/
+    │   ├── post_1.md
+    │   ├── post_2.md
+    │   ├── post_3.md
+    │   ├── post_4.md
+    │   └── post_5.md
+    ├── reels/
+    │   ├── reel_1.md
+    │   └── reel_2.md
+    ├── cold_emails/
+    │   ├── email_persona_1.md
+    │   ├── email_persona_2.md
+    │   └── email_persona_3.md
+    └── outreach/
+        ├── linkedin_outreach.md
+        └── instagram_outreach.md
 ```
 
-### Customizing
+---
 
-**Add your `GROQ_API_KEY` into the `.env` file**
-
-This project is configured to use Groq via LiteLLM (see `model="groq/..."` in `src/testing_project/crew.py`).
-
-If you use `uv`, prefer running inside the project environment:
+## ⚙️ Setup
 
 ```bash
-uv run crewai run
+# 1. Install dependencies
+pip install crewai crewai-tools python-dotenv groq
+
+# 2. Configure environment
+cp .env.example .env
+# Fill in GROQ_API_KEY and SERPER_API_KEY
+
+# 3. Create output directories
+mkdir -p resources/drafts/posts resources/drafts/reels \
+         resources/drafts/cold_emails resources/drafts/outreach
+
+# 4. Run the crew
+python crew.py
 ```
 
-Or activate the uv environment:
+---
 
-```bash
-source .venv/bin/activate
-crewai run
+## 🔧 Swapping Models
+
+In `crew.py`, update the `llm` and `llm_fast` variables:
+
+```python
+# Groq (default)
+llm = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.7)
+
+# Switch to Gemini 2.0 Flash
+llm = LLM(model="gemini/gemini-2.0-flash", temperature=0.7)
+
+# Switch to Cerebras
+llm = LLM(model="cerebras/llama-3.3-70b", temperature=0.7)
 ```
 
-- Modify `src/testing_project/config/agents.yaml` to define your agents
-- Modify `src/testing_project/config/tasks.yaml` to define your tasks
-- Modify `src/testing_project/crew.py` to add your own logic, tools and specific args
-- Modify `src/testing_project/main.py` to add custom inputs for your agents and tasks
+---
 
-## Running the Project
+## 🎯 Inputs
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+Customise these in `crew.py` → `__main__`:
 
-```bash
-$ crewai run
+```python
+inputs = {
+    "product_name": "Your Product Name",
+    "target_audience": "Your Target Audience",
+    "product_description": "What your product does",
+    "budget": "Your Budget",
+    "current_date": datetime.now().strftime("%Y-%m-%d"),
+}
 ```
-
-This command initializes the testing-project Crew, assembling the agents and assigning them tasks as defined in your configuration.
-
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
-
-## Understanding Your Crew
-
-The testing-project Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
-
-## Support
-
-For support, questions, or feedback regarding the TestingProject Crew or crewAI.
-
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.
