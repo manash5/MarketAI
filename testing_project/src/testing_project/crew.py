@@ -1,11 +1,16 @@
-from datetime import datetime
+import logging
 
 from crewai import Agent, Crew, Task, LLM, Process
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import FileReadTool, FileWriterTool, ScrapeWebsiteTool, SerperDevTool
+from crewai_tools import FileWriterTool
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# LiteLLM can emit non-blocking error stacktraces for optional proxy-only modules.
+# Silence those to keep `crewai run` output clean.
+logging.getLogger("LiteLLM").setLevel(logging.CRITICAL)
+logging.getLogger("litellm").setLevel(logging.CRITICAL)
 
 # ─────────────────────────────────────────────
 # LLM Configuration — Ollama (local, no limits)
@@ -16,16 +21,19 @@ load_dotenv()
 llm = LLM(
     model="groq/llama-3.3-70b-versatile",
     temperature=0.7,
+    max_retries=3,
 )
 
 llm_gemini = LLM(
     model="groq/llama-3.3-70b-versatile",
-    temperature=0.7
+    temperature=0.7,
+    max_retries=3,
 )
 
 llm_fast = LLM(
     model="groq/llama-3.3-70b-versatile",
     temperature=0.7,
+    max_retries=3,
 )
 
 
@@ -59,7 +67,7 @@ class TheMarketingCrew():
             inject_date=True,
             llm=llm,
             allow_delegation=False,
-            max_rpm=3,
+            max_rpm=1,
         )
 
     @agent
@@ -73,7 +81,7 @@ class TheMarketingCrew():
             llm=llm_gemini,
             allow_delegation=False,
             max_iter=5,
-            max_rpm=3,
+            max_rpm=1,
         )
 
     @agent
@@ -87,7 +95,7 @@ class TheMarketingCrew():
             llm=llm_fast,
             allow_delegation=False,
             max_iter=5,
-            max_rpm=3,
+            max_rpm=1,
         )
 
     @agent
@@ -101,7 +109,7 @@ class TheMarketingCrew():
             llm=llm_gemini,
             allow_delegation=False,
             max_iter=5,
-            max_rpm=3,
+            max_rpm=1,
         )
 
     # ── Tasks ─────────────────────────────────
@@ -180,7 +188,7 @@ class TheMarketingCrew():
             process=Process.sequential,
             verbose=True,
             planning=False,
-            max_rpm=3,
+            max_rpm=1,
         )
 
 

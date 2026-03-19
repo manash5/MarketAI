@@ -1,0 +1,1 @@
+Hi Financial Controller,\n\nSick of manual data entry errors and wasted time? Our AI-powered Excel automation tool can help. Let's chat about streamlining your financial operations.
