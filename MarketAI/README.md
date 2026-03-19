@@ -63,23 +63,23 @@ task via CrewAI's memory system — no manual handoff needed.
 After a successful run, your `resources/drafts/` folder will contain:
 
 ```
-resources/
-└── drafts/
-    ├── market_research.md       ← competitor + trend analysis
-    ├── marketing_strategy.md    ← full one-week strategy
-    ├── content_calendar.md      ← 7-day posting schedule
-    ├── icp_research.md          ← 3 buyer personas
-    ├── posts/
-    │   ├── post_1.md            ← LinkedIn post
-    │   └── post_2.md            ← Instagram post
-    ├── reels/
-    │   └── reel_1.md            ← Instagram reel script
-    ├── cold_emails/
-    │   ├── email_persona_1.md   ← cold email sequence for persona 1
-    │   └── email_persona_2.md   ← cold email sequence for persona 2
-    └── outreach/
-        ├── linkedin_outreach.md ← LinkedIn DM playbook
-        └── instagram_outreach.md← Instagram DM playbook
+output/
+├── content/
+│   └── content_calendar.md
+├── emails/
+│   ├── email_1.md
+│   └── email_2.md
+├── outreach/
+│   └── outreach.md
+├── posts/
+│   ├── post_1.md
+│   ├── post_2.md
+│   └── post_3.md
+├── research/
+│   ├── icp_research.md
+│   └── market_research.md
+└── strategy/
+    └── marketing_strategy.md
 ```
 
 ---
@@ -163,7 +163,7 @@ Running local models (Mistral, Llama) works but has some quirks:
 
 | Issue | Cause | Status |
 |---|---|---|
-| Tool name hallucination | Small models call wrong tool names | Handled via `max_iter=3` |
+| Groq hallucination | Small models call wrong tool names | Handled via `max_iter=3` |
 | Encoding errors | Emojis in output on Windows | Fixed via `UTF8FileWriterTool` |
 | Slow inference | Large context on CPU | Reduced via short task descriptions |
 | Timeout on later tasks | Accumulated context too large | Reduced via minimal context chaining |
